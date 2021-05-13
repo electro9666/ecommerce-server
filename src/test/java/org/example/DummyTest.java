@@ -40,8 +40,8 @@
 ////@TestPropertySource(properties = { "spring.config.location=classpath:application-test.properties" })
 //@TestInstance(TestInstance.Lifecycle.PER_CLASS) // @BeforeAll을 nonStatic으로 사용할 수 있다.
 //@TestMethodOrder(OrderAnnotation.class) // @Order 사용
-////@SpringBootTest(properties = "spring.config.location=classpath:/application-test.properties")
-//@SpringBootTest
+//@SpringBootTest(properties = "spring.config.location=classpath:/application-testtest.properties")
+////@SpringBootTest
 //public class DummyTest {
 //
 //	@Autowired private PasswordEncoder passwordEncoder;
@@ -58,16 +58,16 @@
 //    public void reset() {
 //    	System.out.println("resetresetresetresetresetresetresetresetresetresetresetreset");
 //    	
-//    	productRepository.deleteAll();
-//    	
-//    	categoryRepository.deleteAll();
-//    	
-//    	storeRepository.deleteAll();
-//    	
-//    	userRepository.deleteAll();
-//    	sellerRepository.deleteAll();
-//    	
-//    	loginMemberRepository.deleteAll();
+////    	productRepository.deleteAll();
+////    	
+////    	categoryRepository.deleteAll();
+////    	
+////    	storeRepository.deleteAll();
+////    	
+////    	userRepository.deleteAll();
+////    	sellerRepository.deleteAll();
+////    	
+////    	loginMemberRepository.deleteAll();
 //    }
 //    
 //    

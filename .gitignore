@@ -7,5 +7,7 @@ build
 
 application-dev.properties
 application-real.properties
+application-testdev.properties
+application-testreal.properties
 deploy.sh
 aws.txt
