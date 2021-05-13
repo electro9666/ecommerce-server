@@ -26,6 +26,10 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
 
+    # appspec.yml 파일 복사
+    - name: Copy appspec.yml
+      run: cp appspec.yml ./build/libs
+
     - name: Make zip file
       run: zip -r ./ecommerce.zip ./build/libs
       
