@@ -49,7 +49,7 @@ import com.jayway.jsonpath.JsonPath;
 //@TestPropertySource(properties = { "spring.config.location=classpath:application-test.properties" })
 @TestInstance(TestInstance.Lifecycle.PER_CLASS) // @BeforeAll을 nonStatic으로 사용할 수 있다.
 @TestMethodOrder(MethodName.class) // 메소드 이름 순으로
-@SpringBootTest(properties = "spring.config.location=classpath:/application-test.properties")
+@SpringBootTest(properties = "spring.config.location=classpath:/application-testtest.properties")
 @DisplayName("API 통합 테스트")
 public class ApiTest {
 
