@@ -18,6 +18,7 @@ public class OrderDto {
 	private Long id;
 	
 	private Long userId;
+	private String userName;
 //	private Seller seller;
 	private OrderStatus status;
 	private int totalPrice;
@@ -28,6 +29,7 @@ public class OrderDto {
 	public OrderDto(Order order) {
 		this.id = order.getId();
 		this.userId = order.getUser().getId();
+		this.userName = order.getUser().getName();
 //		this.seller = order.getSeller();
 		this.status = order.getOrderStatus();
 		this.totalPrice = order.getTotalPrice();
