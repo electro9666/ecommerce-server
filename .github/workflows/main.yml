@@ -27,7 +27,7 @@ jobs:
       run: ./gradlew build
 
     - name: Make zip file
-      run: zip -r ./ecommerce.zip ./build/libs appspec.yml
+      run: zip -r ./ecommerce.zip ./build/libs appspec.yml deploy-ecommerce.sh
       
     - name: Upload S3
       env:
