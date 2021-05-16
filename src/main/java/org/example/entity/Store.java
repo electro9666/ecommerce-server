@@ -1,8 +1,5 @@
 package org.example.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -13,7 +10,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 
 import org.example.constant.StoreStatus;
@@ -37,7 +33,7 @@ public class Store extends BaseEntity {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SEQ_STORE")
 	private Long id;
 	
-	@Column(nullable = false)
+	@Column(nullable = false, unique = true)
 	private String name;
 
 	@Column(nullable = false)

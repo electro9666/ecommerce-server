@@ -38,7 +38,7 @@ public class Product extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SEQ_PRODUCT")
 	private Long id;
-	@Column(nullable = false)
+	@Column(nullable = false, unique = true)
 	private String name;
 	@Column(nullable = false)
 	private String description; // TODO CLOB(textarea or html)

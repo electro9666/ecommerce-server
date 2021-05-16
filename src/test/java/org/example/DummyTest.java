@@ -58,16 +58,17 @@
 //    public void reset() {
 //    	System.out.println("resetresetresetresetresetresetresetresetresetresetresetreset");
 //    	
-////    	productRepository.deleteAll();
-////    	
-////    	categoryRepository.deleteAll();
-////    	
-////    	storeRepository.deleteAll();
-////    	
-////    	userRepository.deleteAll();
-////    	sellerRepository.deleteAll();
-////    	
-////    	loginMemberRepository.deleteAll();
+//    	productRepository.deleteAll();
+//    	
+//    	categoryRepository.deleteAll();
+//    	
+//    	storeRepository.deleteAll();
+//    	
+//    	userRepository.deleteAll();
+//    	sellerRepository.deleteAll();
+//    	
+//    	cashHistoryRepository.deleteAll();
+//    	loginMemberRepository.deleteAll();
 //    }
 //    
 //    
@@ -147,16 +148,16 @@
 //        	
 //        	storeRepository.save(store);
 //        });
-//        IntStream.rangeClosed(1, 2).forEach(i -> {
-//        	Seller seller = sellerRepository.findById(2L).orElse(null);
-//        	Store store = Store.builder()
-//        			.name("스토어" + i)
-//        			.status(StoreStatus.CLOSE)
-//        			.seller(seller)
-//        			.build();
-//        	
-//        	storeRepository.save(store);
-//        });
+////        IntStream.rangeClosed(1, 2).forEach(i -> {
+////        	Seller seller = sellerRepository.findById(2L).orElse(null);
+////        	Store store = Store.builder()
+////        			.name("스토어" + i)
+////        			.status(StoreStatus.CLOSE)
+////        			.seller(seller)
+////        			.build();
+////        	
+////        	storeRepository.save(store);
+////        });
 //    }
 //    @Test
 //    @Order(4)
