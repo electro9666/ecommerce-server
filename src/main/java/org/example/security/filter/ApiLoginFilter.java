@@ -44,6 +44,11 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
         log.info("-----------------ApiLoginFilter---------------------");
         log.info("attemptAuthentication");
 
+        // 모든 method가 다 들어올수 있다. GET,POST,PUT,DELETE,PATCH,,,
+        if (request.getHeader("Content-Type") == null) {
+        	// params가 없으면 아예 content-type자체가 없다.
+        	throw new AuthenticationServiceException("Content-Type is null");
+        }
         // application/json으로 전달하는 경우
         HashMap<String, String> jsonRequest = null;
         if (request.getHeader("Content-Type").contains(ContentType.APPLICATION_JSON.getType())) {
