@@ -8,11 +8,12 @@ import org.example.dto.OrderDto;
 import org.example.dto.PageRequestDto;
 import org.example.dto.PageResultDto;
 import org.example.dto.ProductDto;
+import org.example.dto.ProductOptionDto;
 import org.example.dto.StoreDto;
 import org.example.entity.Category;
-import org.example.entity.ProductOption;
 import org.example.entity.Order;
 import org.example.entity.Product;
+import org.example.entity.ProductOption;
 import org.example.entity.Seller;
 import org.example.entity.Store;
 import org.example.repository.CategoryRepository;
@@ -111,6 +112,23 @@ public class SellerService {
 				throw new IllegalArgumentException("option.price should be more than 0.");
 			}
 		});
+		
+		// 기획: option 개수는 수정불가
+		if (productDto.getId() != null) {
+			// 수정
+			Product product0 = productRepository.findById(productDto.getId()).orElseThrow(() -> new IllegalArgumentException("not found product"));
+			List<ProductOption> options = product0.getOptions();
+			if (options.size() != productDto.getOptions().size()) {
+				throw new IllegalArgumentException("options size should be same.");
+			}
+			List<Long> optionIds = options.stream().mapToLong((t) -> t.getId()).boxed().collect(Collectors.toList());
+			for (ProductOptionDto optionDto : productDto.getOptions()) {
+				if (!optionIds.contains(optionDto.getId())) {
+					throw new IllegalArgumentException(String.format("there is not option [$s] ", optionDto.getId()));
+				}
+			}
+		}
+		
 		Store store = storeRepository.findBySellerIdAndId(loginMemberDto.getId(), productDto.getStoreId());
 		Category category = categoryRepository.findById(productDto.getCategoryId()).orElseThrow(() -> new IllegalArgumentException("invalid category"));
 		
@@ -160,7 +178,7 @@ public class SellerService {
 	public Object orderCancel(LoginMemberDTO loginMemberDto, OrderDto orderDto) {
 		Order order = findOrder(loginMemberDto, orderDto);	
 		orderService.orderCancel(order);
-		return true;
+		return order.getId();
 	}
 	@Transactional
 	public Object orderPrepare(LoginMemberDTO loginMemberDto, OrderDto orderDto) {
@@ -169,7 +187,7 @@ public class SellerService {
 			throw new IllegalArgumentException("주문 상태를 변경할 수 없습니다.");
 		}
 		order.changeStatus(OrderStatus.PREPARE);
-		return true;
+		return order.getId();
 	}
 	@Transactional
 	public Object orderShipping(LoginMemberDTO loginMemberDto, OrderDto orderDto) {
@@ -178,6 +196,6 @@ public class SellerService {
 			throw new IllegalArgumentException("주문 상태를 변경할 수 없습니다.");
 		}
 		order.changeStatus(OrderStatus.SHIPPING);
-		return true;
+		return order.getId();
 	}
 }

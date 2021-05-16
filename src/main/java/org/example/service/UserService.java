@@ -198,8 +198,8 @@ public class UserService {
 		.build();
 		cashHistoryRepository.save(cashHistory);
 		
-		orderRepository.save(order);
-		return true;
+		Order newOrder = orderRepository.save(order);
+		return newOrder.getId();
 	}
 	@Transactional(readOnly = true)
 	public PageResultDto<Order, OrderDto> getOrderList(LoginMemberDTO loginMemberDto, PageRequestDto p) {
@@ -218,7 +218,7 @@ public class UserService {
 			throw new IllegalArgumentException("배송중이 아닌 경우 구매확정 할 수 없습니다.");
 		}
 		order.changeStatus(OrderStatus.CONFIRM);
-		return true;
+		return order.getId();
 	}
 	@Transactional
 	public Object orderCancel(LoginMemberDTO loginMemberDto, OrderDto orderDto) {
@@ -229,7 +229,7 @@ public class UserService {
 			throw new IllegalArgumentException("not found order");
 		}		
 		orderService.orderCancel(order);
-		return true;
+		return order.getId();
 	}
 	@Transactional(readOnly = true)
 	public PageResultDto<CashHistory, CashHistoryDto> cashList(LoginMemberDTO loginMemberDto, PageRequestDto p) {
