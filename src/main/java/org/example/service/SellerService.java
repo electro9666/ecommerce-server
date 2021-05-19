@@ -103,6 +103,7 @@ public class SellerService {
 	// 자기자신 것만 등록/수정 가능하도록
 	@Transactional
 	public Object saveProduct(LoginMemberDTO loginMemberDto, ProductDto productDto) {
+		System.out.println("saveProduct");
 		// TODO option 항목을 삭제하는 것은 화면에서 막았지만, 서버에서 한번 더 검증해야 한다.(다른 옵션이 들어오거나 부족한 경우..) 물론 FK 에러 발생.
 		if (productDto.getOptions() == null || productDto.getOptions().size() < 1) {
 			throw new IllegalArgumentException("option.size should be more than 0.");
@@ -118,10 +119,10 @@ public class SellerService {
 			// 수정
 			Product product0 = productRepository.findById(productDto.getId()).orElseThrow(() -> new IllegalArgumentException("not found product"));
 			List<ProductOption> options = product0.getOptions();
-			if (options.size() != productDto.getOptions().size()) {
-				throw new IllegalArgumentException("options size should be same.");
+			if (options == null || options.size() < 1) {
+				throw new IllegalArgumentException("options is invalid.");
 			}
-			List<Long> optionIds = options.stream().mapToLong((t) -> t.getId()).boxed().collect(Collectors.toList());
+			List<Long> optionIds = options.stream().map((t) -> t.getId()).collect(Collectors.toList());
 			for (ProductOptionDto optionDto : productDto.getOptions()) {
 				if (!optionIds.contains(optionDto.getId())) {
 					throw new IllegalArgumentException(String.format("there is not option [$s] ", optionDto.getId()));
@@ -130,6 +131,9 @@ public class SellerService {
 		}
 		
 		Store store = storeRepository.findBySellerIdAndId(loginMemberDto.getId(), productDto.getStoreId());
+		if (store == null) {
+			throw new IllegalArgumentException("store is null");
+		}
 		Category category = categoryRepository.findById(productDto.getCategoryId()).orElseThrow(() -> new IllegalArgumentException("invalid category"));
 		
 		Product product = Product.builder()
