@@ -114,7 +114,6 @@ public class SellerService {
 			}
 		});
 		
-		// 기획: option 개수는 수정불가
 		if (productDto.getId() != null) {
 			// 수정
 			Product product0 = productRepository.findById(productDto.getId()).orElseThrow(() -> new IllegalArgumentException("not found product"));
@@ -122,10 +121,13 @@ public class SellerService {
 			if (options == null || options.size() < 1) {
 				throw new IllegalArgumentException("options is invalid.");
 			}
-			List<Long> optionIds = options.stream().map((t) -> t.getId()).collect(Collectors.toList());
-			for (ProductOptionDto optionDto : productDto.getOptions()) {
-				if (!optionIds.contains(optionDto.getId())) {
-					throw new IllegalArgumentException(String.format("there is not option [$s] ", optionDto.getId()));
+			
+			// 기획: option 개수는 수정불가 (DB에서 조회한 optionId는 모두 포함해야 한다.)
+			List<Long> optionIdsByParams = productDto.getOptions().stream().map(t -> t.getId()).collect(Collectors.toList());
+			List<Long> optionIdsByDB = options.stream().map((t) -> t.getId()).collect(Collectors.toList());
+			for (Long optionId : optionIdsByDB) {
+				if (!optionIdsByParams.contains(optionId)) {
+					throw new IllegalArgumentException(String.format("there is not option [%s] ", optionId));
 				}
 			}
 		}
@@ -181,6 +183,11 @@ public class SellerService {
 	@Transactional
 	public Object orderCancel(LoginMemberDTO loginMemberDto, OrderDto orderDto) {
 		Order order = findOrder(loginMemberDto, orderDto);	
+		
+		if (!OrderStatus.ORDER.equals(order.getOrderStatus()) || !OrderStatus.PREPARE.equals(order.getOrderStatus()) || !OrderStatus.SHIPPING.equals(order.getOrderStatus())) {
+			throw new IllegalArgumentException("주문시작,상품준비중,배송중이 아닌 경우 취소 할 수 없습니다.");
+		}
+		
 		orderService.orderCancel(order);
 		return order.getId();
 	}
@@ -188,7 +195,7 @@ public class SellerService {
 	public Object orderPrepare(LoginMemberDTO loginMemberDto, OrderDto orderDto) {
 		Order order = findOrder(loginMemberDto, orderDto);	
 		if (!OrderStatus.ORDER.equals(order.getOrderStatus())) {
-			throw new IllegalArgumentException("주문 상태를 변경할 수 없습니다.");
+			throw new IllegalArgumentException("주문시작이 아닌 경우 상태를 변경할 수 없습니다.");
 		}
 		order.changeStatus(OrderStatus.PREPARE);
 		return order.getId();
@@ -197,7 +204,7 @@ public class SellerService {
 	public Object orderShipping(LoginMemberDTO loginMemberDto, OrderDto orderDto) {
 		Order order = findOrder(loginMemberDto, orderDto);
 		if (!OrderStatus.PREPARE.equals(order.getOrderStatus())) {
-			throw new IllegalArgumentException("주문 상태를 변경할 수 없습니다.");
+			throw new IllegalArgumentException("상품준비중이 아닌 경우 상태를 변경할 수 없습니다.");
 		}
 		order.changeStatus(OrderStatus.SHIPPING);
 		return order.getId();

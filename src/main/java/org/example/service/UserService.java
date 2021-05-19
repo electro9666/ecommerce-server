@@ -226,7 +226,10 @@ public class UserService {
 		Order order = orderAll.getContent().get(0);
 		if (order == null) {
 			throw new IllegalArgumentException("not found order");
-		}		
+		}
+		if (!OrderStatus.ORDER.equals(order.getOrderStatus()) || !OrderStatus.PREPARE.equals(order.getOrderStatus())) {
+			throw new IllegalArgumentException("주문시작 및 상품준비중에만 취소 할 수 없습니다.");
+		}
 		orderService.orderCancel(order);
 		return order.getId();
 	}
