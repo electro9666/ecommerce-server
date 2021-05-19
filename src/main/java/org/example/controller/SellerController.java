@@ -65,7 +65,7 @@ public class SellerController {
 		return sellerService.saveProduct(loginMemberDto, ProductDto);
 	}
 	@PutMapping("/product")
-	public Object updateStore(@AuthenticationPrincipal LoginMemberDTO loginMemberDto, @Valid @RequestBody ProductDto ProductDto) {
+	public Object saveProduct(@AuthenticationPrincipal LoginMemberDTO loginMemberDto, @Valid @RequestBody ProductDto ProductDto) {
 		return sellerService.saveProduct(loginMemberDto, ProductDto);
 	}
 	@GetMapping("/order/list")
