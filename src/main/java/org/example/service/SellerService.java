@@ -103,6 +103,7 @@ public class SellerService {
 	// 자기자신 것만 등록/수정 가능하도록
 	@Transactional
 	public Object saveProduct(LoginMemberDTO loginMemberDto, ProductDto productDto) {
+		System.out.println("saveProduct");
 		// TODO option 항목을 삭제하는 것은 화면에서 막았지만, 서버에서 한번 더 검증해야 한다.(다른 옵션이 들어오거나 부족한 경우..) 물론 FK 에러 발생.
 		if (productDto.getOptions() == null || productDto.getOptions().size() < 1) {
 			throw new IllegalArgumentException("option.size should be more than 0.");
@@ -113,23 +114,28 @@ public class SellerService {
 			}
 		});
 		
-		// 기획: option 개수는 수정불가
 		if (productDto.getId() != null) {
 			// 수정
 			Product product0 = productRepository.findById(productDto.getId()).orElseThrow(() -> new IllegalArgumentException("not found product"));
 			List<ProductOption> options = product0.getOptions();
-			if (options.size() != productDto.getOptions().size()) {
-				throw new IllegalArgumentException("options size should be same.");
+			if (options == null || options.size() < 1) {
+				throw new IllegalArgumentException("options is invalid.");
 			}
-			List<Long> optionIds = options.stream().mapToLong((t) -> t.getId()).boxed().collect(Collectors.toList());
-			for (ProductOptionDto optionDto : productDto.getOptions()) {
-				if (!optionIds.contains(optionDto.getId())) {
-					throw new IllegalArgumentException(String.format("there is not option [$s] ", optionDto.getId()));
+			
+			// 기획: option 개수는 수정불가 (DB에서 조회한 optionId는 모두 포함해야 한다.)
+			List<Long> optionIdsByParams = productDto.getOptions().stream().map(t -> t.getId()).collect(Collectors.toList());
+			List<Long> optionIdsByDB = options.stream().map((t) -> t.getId()).collect(Collectors.toList());
+			for (Long optionId : optionIdsByDB) {
+				if (!optionIdsByParams.contains(optionId)) {
+					throw new IllegalArgumentException(String.format("there is not option [%s] ", optionId));
 				}
 			}
 		}
 		
 		Store store = storeRepository.findBySellerIdAndId(loginMemberDto.getId(), productDto.getStoreId());
+		if (store == null) {
+			throw new IllegalArgumentException("store is null");
+		}
 		Category category = categoryRepository.findById(productDto.getCategoryId()).orElseThrow(() -> new IllegalArgumentException("invalid category"));
 		
 		Product product = Product.builder()
@@ -177,6 +183,11 @@ public class SellerService {
 	@Transactional
 	public Object orderCancel(LoginMemberDTO loginMemberDto, OrderDto orderDto) {
 		Order order = findOrder(loginMemberDto, orderDto);	
+		
+		if (!OrderStatus.ORDER.equals(order.getOrderStatus()) || !OrderStatus.PREPARE.equals(order.getOrderStatus()) || !OrderStatus.SHIPPING.equals(order.getOrderStatus())) {
+			throw new IllegalArgumentException("주문시작,상품준비중,배송중이 아닌 경우 취소 할 수 없습니다.");
+		}
+		
 		orderService.orderCancel(order);
 		return order.getId();
 	}
@@ -184,7 +195,7 @@ public class SellerService {
 	public Object orderPrepare(LoginMemberDTO loginMemberDto, OrderDto orderDto) {
 		Order order = findOrder(loginMemberDto, orderDto);	
 		if (!OrderStatus.ORDER.equals(order.getOrderStatus())) {
-			throw new IllegalArgumentException("주문 상태를 변경할 수 없습니다.");
+			throw new IllegalArgumentException("주문시작이 아닌 경우 상태를 변경할 수 없습니다.");
 		}
 		order.changeStatus(OrderStatus.PREPARE);
 		return order.getId();
@@ -193,7 +204,7 @@ public class SellerService {
 	public Object orderShipping(LoginMemberDTO loginMemberDto, OrderDto orderDto) {
 		Order order = findOrder(loginMemberDto, orderDto);
 		if (!OrderStatus.PREPARE.equals(order.getOrderStatus())) {
-			throw new IllegalArgumentException("주문 상태를 변경할 수 없습니다.");
+			throw new IllegalArgumentException("상품준비중이 아닌 경우 상태를 변경할 수 없습니다.");
 		}
 		order.changeStatus(OrderStatus.SHIPPING);
 		return order.getId();

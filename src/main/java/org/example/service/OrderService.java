@@ -41,9 +41,7 @@ public class OrderService {
 
 	@Transactional
 	public Object orderCancel(Order order) {
-		if (OrderStatus.CONFIRM.equals(order.getOrderStatus()) || OrderStatus.CANCEL.equals(order.getOrderStatus())) {
-			throw new IllegalArgumentException("취소할 수 없습니다.");
-		}
+		// 주문을 취소할 수 있는 조건이 사용자/판매자별로 다르므로 앞단의 서비스에서 validation 처리함.
 		order.changeStatus(OrderStatus.CANCEL);
 		
 		System.out.println("User 환불");
