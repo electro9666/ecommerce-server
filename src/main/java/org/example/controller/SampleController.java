@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.sentry.Sentry;
@@ -30,6 +31,17 @@ public class SampleController {
 		Map<String, String> map = new HashMap<>();
 		map.put("code", "hhh22");
 		map.put("message", "12322");
+		return map;
+	}
+	
+	@GetMapping(path = "/get/{id}")
+	public Map<String, Object> all3(@PathVariable("id") long id, @RequestParam(name = "name", required = false) String name, @RequestParam(name = "age", required = false) String age) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("code", "hhh22");
+		map.put("message", "12322");
+		map.put("id", id);
+		map.put("name", name);
+		map.put("age", age);
 		return map;
 	}
 

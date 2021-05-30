@@ -1,0 +1,24 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+:doctype: sample-test
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+:operation-http-request-title: Example Request
+:operation-http-response-title: Example Response
+
+[[resources]]
+= Resources
+
+[[resources-sample-test]]
+== sample-test
+
+[[resources-sample-test]]
+=== 정보 가져 오기
+include::{snippets}/sample-test/http-request.adoc[]
+include::{snippets}/sample-test/http-response.adoc[]
+include::{snippets}/sample-test/response-fields.adoc[]
+include::{snippets}/sample-test/request-fields.adoc[]
