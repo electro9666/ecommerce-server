@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.sentry.Sentry;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -21,6 +22,7 @@ public class SampleController {
 	public String all() {
 		return "all123";
 	}
+
 	@PostMapping(path = "/post/{id}")
 	public Map<String, String> all2(@PathVariable("id") long id, @RequestBody Map<String, String> k) {
 		System.out.println("id: " + id);
@@ -29,5 +31,15 @@ public class SampleController {
 		map.put("code", "hhh22");
 		map.put("message", "12322");
 		return map;
+	}
+
+	@GetMapping(path = "/sentry-test")
+	public String sentryTest() {
+		try {
+			throw new Exception("This is a test.");
+		} catch (Exception e) {
+			Sentry.captureException(e);
+		}
+		return "sentry";
 	}
 }
