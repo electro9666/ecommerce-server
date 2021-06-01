@@ -97,15 +97,14 @@ compileQuerydsl {
 }
 
 // spring rest docs
+//asciidoctor {
+//    inputs.dir snippetsDir  // (7)
+//    dependsOn test          // (8)
+//}
 
-asciidoctor {
-    inputs.dir snippetsDir  // (7)
-    dependsOn test          // (8)
-}
-
-bootJar {
-    dependsOn asciidoctor                      // (9)
-    from ("${asciidoctor.outputDir}/html5") {  // (10)
-        into 'static/docs'                       
-    }
-}
+//bootJar {
+//    dependsOn asciidoctor                      // (9)
+//    from ("${asciidoctor.outputDir}/html5") {  // (10)
+//        into 'static/docs'                       
+//    }
+//}
