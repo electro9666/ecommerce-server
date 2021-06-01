@@ -1,0 +1,23 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+:operation-http-request-title: Example Request
+:operation-http-response-title: Example Response
+
+[[resources]]
+= Resources
+
+[[resources-user]]
+== Member
+
+[[resources-user-create]]
+=== 샘플
+
+//generated-snippets 경로에 있는 파일 중 문서에 포함시킬 내용을 입력해줍니다.
+operation::sample-test[snippets='curl-request,http-request,http-response,httpie-request,request-body,response-body,response-fields']

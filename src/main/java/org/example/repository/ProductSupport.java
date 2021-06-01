@@ -5,6 +5,7 @@ import static org.example.entity.QProduct.product;
 import java.util.List;
 
 import org.example.dto.PageRequestDto;
+import org.example.dto.PageSearchProductRequest;
 import org.example.entity.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -15,7 +16,6 @@ import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 import org.springframework.stereotype.Repository;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -51,7 +51,7 @@ public class ProductSupport extends QuerydslRepositorySupport {
 		return new PageImpl<>(result, pageable, total);
 	}
 	
-	public Page<Product> searchProductForUser(PageRequestDto pageRequestDto) {
+	public Page<Product> searchProductForUser(PageSearchProductRequest pageRequestDto) {
 		System.out.println("searchProductForUser");
 		PageRequest pageRequest = PageRequest.of(pageRequestDto.getPage() - 1, pageRequestDto.getTake(), Direction.DESC, "updateDate");
 		

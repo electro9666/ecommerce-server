@@ -5,11 +5,13 @@ import java.util.stream.Collectors;
 
 import org.example.constant.OrderStatus;
 import org.example.dto.OrderDto;
+import org.example.dto.PageBaseRequest;
 import org.example.dto.PageRequestDto;
 import org.example.dto.PageResultDto;
 import org.example.dto.ProductDto;
-import org.example.dto.ProductOptionDto;
+import org.example.dto.ProductRequestDto;
 import org.example.dto.StoreDto;
+import org.example.dto.StoreRequestDto;
 import org.example.entity.Category;
 import org.example.entity.Order;
 import org.example.entity.Product;
@@ -54,7 +56,7 @@ public class SellerService {
 	 * store
 	 */
 	@Transactional(readOnly = true)
-	public PageResultDto<Store, StoreDto> storeList(LoginMemberDTO loginMemberDto, PageRequestDto p) {
+	public PageResultDto<Store, StoreDto> storeList(LoginMemberDTO loginMemberDto, PageBaseRequest p) {
 		PageRequest pr = PageRequest.of(p.getPage() - 1, p.getTake(), Direction.DESC, "id");
 		Page<Store> findAll = storeRepository.findBySellerId(loginMemberDto.getId(), pr);
 		return new PageResultDto<>(findAll, t -> new StoreDto(t));
@@ -68,10 +70,14 @@ public class SellerService {
 		return new StoreDto(store);
 	}
 	@Transactional
-	public Object saveStore(LoginMemberDTO loginMemberDto, StoreDto storeDto) {
+	public Long saveStore(LoginMemberDTO loginMemberDto, StoreRequestDto.Post storeDto) {
+		Long storeId = null;
+		if (storeDto instanceof StoreRequestDto.Put) {
+			storeId = ((StoreRequestDto.Put) storeDto).getId();
+		}
 		Seller seller = sellerRepository.findById(loginMemberDto.getId()).orElseThrow(() -> new IllegalArgumentException("not found seller"));
 		Store store = Store.builder()
-				.id(storeDto.getId())
+				.id(storeId)
 				.name(storeDto.getName())
 				.status(storeDto.getStatus())
 				.seller(seller)
@@ -102,8 +108,11 @@ public class SellerService {
 	}
 	// 자기자신 것만 등록/수정 가능하도록
 	@Transactional
-	public Object saveProduct(LoginMemberDTO loginMemberDto, ProductDto productDto) {
-		System.out.println("saveProduct");
+	public Long saveProduct(LoginMemberDTO loginMemberDto, ProductRequestDto.Post productDto) {
+		Long productId = null;
+		if (productDto instanceof ProductRequestDto.Put) {
+			productId = ((ProductRequestDto.Put) productDto).getId();
+		}
 		// TODO option 항목을 삭제하는 것은 화면에서 막았지만, 서버에서 한번 더 검증해야 한다.(다른 옵션이 들어오거나 부족한 경우..) 물론 FK 에러 발생.
 		if (productDto.getOptions() == null || productDto.getOptions().size() < 1) {
 			throw new IllegalArgumentException("option.size should be more than 0.");
@@ -114,9 +123,9 @@ public class SellerService {
 			}
 		});
 		
-		if (productDto.getId() != null) {
+		if (productId != null) {
 			// 수정
-			Product product0 = productRepository.findById(productDto.getId()).orElseThrow(() -> new IllegalArgumentException("not found product"));
+			Product product0 = productRepository.findById(productId).orElseThrow(() -> new IllegalArgumentException("not found product"));
 			List<ProductOption> options = product0.getOptions();
 			if (options == null || options.size() < 1) {
 				throw new IllegalArgumentException("options is invalid.");
@@ -139,7 +148,7 @@ public class SellerService {
 		Category category = categoryRepository.findById(productDto.getCategoryId()).orElseThrow(() -> new IllegalArgumentException("invalid category"));
 		
 		Product product = Product.builder()
-			.id(productDto.getId())
+			.id(productId)
 			.name(productDto.getName())
 			.description(productDto.getDescription())
 			.background(productDto.getBackground())
@@ -166,14 +175,14 @@ public class SellerService {
 	 * order
 	 */
 	@Transactional(readOnly = true)
-	public PageResultDto<Order, OrderDto> orderList(LoginMemberDTO loginMemberDto, PageRequestDto p) {
+	public PageResultDto<Order, OrderDto> orderList(LoginMemberDTO loginMemberDto, PageBaseRequest p) {
 		PageRequest pr = PageRequest.of(p.getPage() - 1, p.getTake(), Direction.DESC, "id");
 		Page<Order> findAll = orderRepository.findBySellerId(loginMemberDto.getId(), pr);
 		return new PageResultDto<>(findAll, t -> new OrderDto(t));
 	}
-	public Order findOrder(LoginMemberDTO loginMemberDto, OrderDto orderDto) {
+	public Order findOrder(LoginMemberDTO loginMemberDto, Long id) {
 		PageRequest pr = PageRequest.of(0, 1, Direction.DESC, "id");
-		Page<Order> orderAll = orderRepository.findByIdAndSellerId(orderDto.getId(), loginMemberDto.getId(), pr);
+		Page<Order> orderAll = orderRepository.findByIdAndSellerId(id, loginMemberDto.getId(), pr);
 		Order order = orderAll.getContent().get(0);
 		if (order == null) {
 			throw new IllegalArgumentException("not found order");
@@ -181,8 +190,8 @@ public class SellerService {
 		return order;
 	}
 	@Transactional
-	public Object orderCancel(LoginMemberDTO loginMemberDto, OrderDto orderDto) {
-		Order order = findOrder(loginMemberDto, orderDto);	
+	public Long orderCancel(LoginMemberDTO loginMemberDto, Long id) {
+		Order order = findOrder(loginMemberDto, id);	
 		
 		if (!OrderStatus.ORDER.equals(order.getOrderStatus()) || !OrderStatus.PREPARE.equals(order.getOrderStatus()) || !OrderStatus.SHIPPING.equals(order.getOrderStatus())) {
 			throw new IllegalArgumentException("주문시작,상품준비중,배송중이 아닌 경우 취소 할 수 없습니다.");
@@ -192,8 +201,8 @@ public class SellerService {
 		return order.getId();
 	}
 	@Transactional
-	public Object orderPrepare(LoginMemberDTO loginMemberDto, OrderDto orderDto) {
-		Order order = findOrder(loginMemberDto, orderDto);	
+	public Long orderPrepare(LoginMemberDTO loginMemberDto, Long id) {
+		Order order = findOrder(loginMemberDto, id);	
 		if (!OrderStatus.ORDER.equals(order.getOrderStatus())) {
 			throw new IllegalArgumentException("주문시작이 아닌 경우 상태를 변경할 수 없습니다.");
 		}
@@ -201,8 +210,8 @@ public class SellerService {
 		return order.getId();
 	}
 	@Transactional
-	public Object orderShipping(LoginMemberDTO loginMemberDto, OrderDto orderDto) {
-		Order order = findOrder(loginMemberDto, orderDto);
+	public Long orderShipping(LoginMemberDTO loginMemberDto, Long id) {
+		Order order = findOrder(loginMemberDto, id);
 		if (!OrderStatus.PREPARE.equals(order.getOrderStatus())) {
 			throw new IllegalArgumentException("상품준비중이 아닌 경우 상태를 변경할 수 없습니다.");
 		}
