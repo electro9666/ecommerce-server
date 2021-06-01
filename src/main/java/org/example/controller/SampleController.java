@@ -1,8 +1,13 @@
 package org.example.controller;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.example.security.util.JWTUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,9 +24,24 @@ import lombok.RequiredArgsConstructor;
 @RestController
 public class SampleController {
 
+	@Autowired private JWTUtil jwtUtil;
+	
 	@GetMapping(path = "/all")
 	public String all() {
 		return "all123";
+	}
+	
+	@GetMapping(path = "/token")
+	public String token() {
+		List<String> roles = new ArrayList<>(Arrays.asList("ROLE_USER"));
+
+        String token = null;
+        try {
+            token = "Bearer " + jwtUtil.generateToken(1L, "1111", roles);
+        } catch(Exception e) {
+        	
+        }
+		return token;
 	}
 
 	@PostMapping(path = "/post/{id}")

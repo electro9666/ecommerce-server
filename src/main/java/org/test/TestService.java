@@ -1,8 +1,8 @@
 package org.test;
 
 
-import org.example.dto.PageRequestDto;
 import org.example.dto.PageResultDto;
+import org.example.dto.PageSearchProductRequest;
 import org.example.dto.ProductDto;
 import org.example.entity.Product;
 import org.example.service.UserService;
@@ -17,8 +17,7 @@ public class TestService {
 		this.userService = userService;
 	}
 	
-	public PageResultDto<Product, ProductDto> searchProductList(PageRequestDto pageRequestDto) {
-		System.out.println("MyService");
+	public PageResultDto<Product, ProductDto> searchProductList(PageSearchProductRequest pageRequestDto) {
 		return userService.searchProductList(pageRequestDto);
 	}
 

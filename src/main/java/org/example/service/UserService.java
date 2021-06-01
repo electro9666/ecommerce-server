@@ -9,18 +9,20 @@ import org.example.constant.CashHistoryReason;
 import org.example.constant.OrderStatus;
 import org.example.constant.ProductStatus;
 import org.example.dto.CartDto;
+import org.example.dto.CartPostDto;
 import org.example.dto.CashHistoryDto;
 import org.example.dto.OrderDto;
-import org.example.dto.PageRequestDto;
+import org.example.dto.PageBaseRequest;
 import org.example.dto.PageResultDto;
+import org.example.dto.PageSearchProductRequest;
 import org.example.dto.ProductDto;
 import org.example.entity.Cart;
 import org.example.entity.CartOption;
 import org.example.entity.CashHistory;
-import org.example.entity.ProductOption;
 import org.example.entity.Order;
 import org.example.entity.OrderOption;
 import org.example.entity.Product;
+import org.example.entity.ProductOption;
 import org.example.entity.User;
 import org.example.repository.CartRepository;
 import org.example.repository.CashHistoryRepository;
@@ -62,7 +64,7 @@ public class UserService {
 		return new PageResultDto<>(findAll, t -> new ProductDto(t));
 	}
 	@Transactional(readOnly = true)
-	public PageResultDto<Product, ProductDto> searchProductList(PageRequestDto p) {
+	public PageResultDto<Product, ProductDto> searchProductList(PageSearchProductRequest p) {
 		Page<Product> findAll = productSupport.searchProductForUser(p);
 		return new PageResultDto<>(findAll, t -> new ProductDto(t));
 	}
@@ -75,7 +77,7 @@ public class UserService {
 		return new ProductDto(product);
 	}
 	@Transactional
-	public Object addCart(LoginMemberDTO loginMemberDto, CartDto cartDto) {
+	public Long addCart(LoginMemberDTO loginMemberDto, CartPostDto cartDto) {
 		Product product = productRepository.findById(cartDto.getProductId()).orElseThrow(() -> new IllegalArgumentException("not found product"));
 		if (!ProductStatus.OPEN.equals(product.getStatus())) {
 			throw new IllegalArgumentException("상품이 현재 판매불가 상태입니다.");			
@@ -107,12 +109,12 @@ public class UserService {
 		return save.getId();
 	}
 	@Transactional(readOnly = true)
-	public Object getCartList(LoginMemberDTO loginMemberDto, PageRequestDto p) {
+	public PageResultDto<Cart, CartDto> getCartList(LoginMemberDTO loginMemberDto) {
 		Page<Cart> findAll = cartRepository.findByUserIdAndStatus(loginMemberDto.getId(), CartStatus.CART, PageRequest.of(0, 100000, Direction.DESC, "updateDate"));
 		return new PageResultDto<>(findAll, t -> new CartDto(t));
 	}
 	@Transactional
-	public Object deleteCart(LoginMemberDTO loginMemberDto, long id) {
+	public Boolean deleteCart(LoginMemberDTO loginMemberDto, long id) {
 		Cart cart = cartRepository.findByIdAndUserId(id, loginMemberDto.getId());
 		if (cart == null) {
 			throw new IllegalArgumentException("not found cart");
@@ -149,7 +151,7 @@ public class UserService {
 		return result;
 	}
 	@Transactional
-	public Object addOrder(LoginMemberDTO loginMemberDto) {
+	public Long addOrder(LoginMemberDTO loginMemberDto) {
 		List<Cart> cartList = cartRepository.findByUserIdAndStatus(loginMemberDto.getId(), CartStatus.CART, PageRequest.of(0, 100000, Direction.DESC, "updateDate")).getContent();
 		List<Cart> cartForOrderList = cartList.stream().filter((cart) -> isValid(cart)).collect(Collectors.toList());
 		if (cartForOrderList.size() == 0) {
@@ -201,14 +203,14 @@ public class UserService {
 		return newOrder.getId();
 	}
 	@Transactional(readOnly = true)
-	public PageResultDto<Order, OrderDto> getOrderList(LoginMemberDTO loginMemberDto, PageRequestDto p) {
+	public PageResultDto<Order, OrderDto> getOrderList(LoginMemberDTO loginMemberDto, PageBaseRequest p) {
 		Page<Order> findAll = orderRepository.findByUserId(loginMemberDto.getId(), PageRequest.of(p.getPage() - 1, p.getTake(), Direction.DESC, "id"));
 		return new PageResultDto<>(findAll, t -> new OrderDto(t));
 	}
 	@Transactional
-	public Object orderConfirm(LoginMemberDTO loginMemberDto, OrderDto orderDto) {
+	public Long orderConfirm(LoginMemberDTO loginMemberDto, Long id) {
 		PageRequest pr = PageRequest.of(0, 1, Direction.DESC, "id");
-		Page<Order> orderAll = orderRepository.findByIdAndUserId(orderDto.getId(), loginMemberDto.getId(), pr);
+		Page<Order> orderAll = orderRepository.findByIdAndUserId(id, loginMemberDto.getId(), pr);
 		Order order = orderAll.getContent().get(0);
 		if (order == null) {
 			throw new IllegalArgumentException("not found order");
@@ -220,9 +222,9 @@ public class UserService {
 		return order.getId();
 	}
 	@Transactional
-	public Object orderCancel(LoginMemberDTO loginMemberDto, OrderDto orderDto) {
+	public Long orderCancel(LoginMemberDTO loginMemberDto, Long id) {
 		PageRequest pr = PageRequest.of(0, 1, Direction.DESC, "id");
-		Page<Order> orderAll = orderRepository.findByIdAndUserId(orderDto.getId(), loginMemberDto.getId(), pr);
+		Page<Order> orderAll = orderRepository.findByIdAndUserId(id, loginMemberDto.getId(), pr);
 		Order order = orderAll.getContent().get(0);
 		if (order == null) {
 			throw new IllegalArgumentException("not found order");
@@ -234,12 +236,12 @@ public class UserService {
 		return order.getId();
 	}
 	@Transactional(readOnly = true)
-	public PageResultDto<CashHistory, CashHistoryDto> cashList(LoginMemberDTO loginMemberDto, PageRequestDto p) {
+	public PageResultDto<CashHistory, CashHistoryDto> cashList(LoginMemberDTO loginMemberDto, PageBaseRequest p) {
 		Page<CashHistory> findAll = cashHistoryRepository.findByUserId(loginMemberDto.getId(), PageRequest.of(p.getPage() - 1, p.getTake(), Direction.DESC, "regDate"));
 		return new PageResultDto<>(findAll, t -> new CashHistoryDto(t));
 	}
 	@Transactional
-	public Object addCash(LoginMemberDTO loginMemberDto) {
+	public Boolean addCash(LoginMemberDTO loginMemberDto) {
 		int cash = 1000000;
 		User user = userRepository.findById(loginMemberDto.getId()).orElseThrow(() -> new IllegalArgumentException("not found user"));
 		user.addCash(cash);
@@ -253,7 +255,7 @@ public class UserService {
 		return true;
 	}
 	@Transactional(readOnly = true)
-	public int cashCurrent(LoginMemberDTO loginMemberDto) {
+	public Integer cashCurrent(LoginMemberDTO loginMemberDto) {
 		User user = userRepository.findById(loginMemberDto.getId()).orElseThrow(() -> new IllegalArgumentException("not found user"));
 		return user.getCash();
 	}
