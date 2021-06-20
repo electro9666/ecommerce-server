@@ -3,6 +3,7 @@ package org.example.controller;
 import org.example.dto.CartDto;
 import org.example.dto.CartPostDto;
 import org.example.dto.CashHistoryDto;
+import org.example.dto.IdDto;
 import org.example.dto.OrderDto;
 import org.example.dto.PageBaseRequest;
 import org.example.dto.PageResultDto;
@@ -85,13 +86,13 @@ public class UserController {
 	}
 	@ApiOperation(value = "주문 상태 변경(확인)", tags = "주문")
 	@PostMapping("/order/confirm")
-	public Long orderConfirm(@AuthenticationPrincipal LoginMemberDTO loginMemberDto, @RequestBody Long id) {
-		return userService.orderConfirm(loginMemberDto, id);
+	public Long orderConfirm(@AuthenticationPrincipal LoginMemberDTO loginMemberDto, @RequestBody IdDto idDto) {
+		return userService.orderConfirm(loginMemberDto, idDto.getId());
 	}
 	@ApiOperation(value = "주문 상태 변경(취소)", tags = "주문")
 	@PostMapping("/order/cancel")
-	public Long orderCancel(@AuthenticationPrincipal LoginMemberDTO loginMemberDto, @RequestBody Long id) {
-		return userService.orderCancel(loginMemberDto, id);
+	public Long orderCancel(@AuthenticationPrincipal LoginMemberDTO loginMemberDto, @RequestBody IdDto idDto) {
+		return userService.orderCancel(loginMemberDto, idDto.getId());
 	}
 	@ApiOperation(value = "캐시 내역", tags = "캐시")
 	@GetMapping("/cash/list")
