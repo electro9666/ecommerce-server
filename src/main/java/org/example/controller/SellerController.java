@@ -2,6 +2,7 @@ package org.example.controller;
 
 import javax.validation.Valid;
 
+import org.example.dto.IdDto;
 import org.example.dto.OrderDto;
 import org.example.dto.PageBaseRequest;
 import org.example.dto.PageRequestDto;
@@ -90,17 +91,17 @@ public class SellerController {
 	}
 	@ApiOperation(value = "주문 상태 변경(취소)", tags = "주문")
 	@PostMapping("/order/cancel")
-	public Long orderCancel(@AuthenticationPrincipal LoginMemberDTO loginMemberDto, @RequestBody Long id) {
-		return sellerService.orderCancel(loginMemberDto, id);
+	public Long orderCancel(@AuthenticationPrincipal LoginMemberDTO loginMemberDto, @RequestBody IdDto idDto) {
+		return sellerService.orderCancel(loginMemberDto, idDto.getId());
 	}
 	@ApiOperation(value = "주문 상태 변경(준비중)", tags = "주문")
 	@PostMapping("/order/prepare")
-	public Long orderPrepare(@AuthenticationPrincipal LoginMemberDTO loginMemberDto, @RequestBody Long id) {
-		return sellerService.orderPrepare(loginMemberDto, id);
+	public Long orderPrepare(@AuthenticationPrincipal LoginMemberDTO loginMemberDto, @RequestBody IdDto idDto) {
+		return sellerService.orderPrepare(loginMemberDto, idDto.getId());
 	}
 	@ApiOperation(value = "주문 상태 변경(배송중)", tags = "주문")
 	@PostMapping("/order/shipping")
-	public Long orderShipping(@AuthenticationPrincipal LoginMemberDTO loginMemberDto, @RequestBody Long id) {
-		return sellerService.orderShipping(loginMemberDto, id);
+	public Long orderShipping(@AuthenticationPrincipal LoginMemberDTO loginMemberDto, @RequestBody IdDto idDto) {
+		return sellerService.orderShipping(loginMemberDto, idDto.getId());
 	}
 }
